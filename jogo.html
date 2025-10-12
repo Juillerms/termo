@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo - O Jogo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Jogo Termo</h1>
+            <h3 id="turn-indicator"></h3>
+        </header>
+
+        <div class="game-wrapper">
+            
+            <div class="main-game-area">
+                <main>
+                    <div id="game-board-container">
+                        </div>
+                </main>
+                <footer>
+                    <div id="keyboard-container">
+                        <div class="keyboard-row">
+                            <button data-key="Q">Q</button><button data-key="W">W</button><button data-key="E">E</button><button data-key="R">R</button><button data-key="T">T</button><button data-key="Y">Y</button><button data-key="U">U</button><button data-key="I">I</button><button data-key="O">O</button><button data-key="P">P</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button data-key="A">A</button><button data-key="S">S</button><button data-key="D">D</button><button data-key="F">F</button><button data-key="G">G</button><button data-key="H">H</button><button data-key="J">J</button><button data-key="K">K</button><button data-key="L">L</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button data-key="ENTER" class="key-large">ENTER</button><button data-key="Z">Z</button><button data-key="X">X</button><button data-key="C">C</button><button data-key="V">V</button><button data-key="B">B</button><button data-key="N">N</button><button data-key="M">M</button><button data-key="BACKSPACE" class="key-large">⌫</button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+            <aside id="ranking-panel">
+                <h4>Placar da Partida</h4>
+                <div id="last-word-info">
+                    </div>
+                <table id="live-ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Pos.</th>
+                            <th>Jogador</th>
+                            <th>Pontos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="live-ranking-body">
+                        </tbody>
+                </table>
+            </aside>
+        </div>
+
+        <div id="ranking-modal-overlay" class="hidden">
+            <div id="ranking-modal">
+                <h2>Fim de Jogo!</h2>
+                <table id="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Palavras Acertadas</th>
+                            <th>Quais Palavras</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-table-body"></tbody>
+                </table>
+                <button id="ranking-play-again-btn" class="btn-start">Jogar Novamente</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/palavras.js" defer></script>
+    <script src="js/jogo.js" defer></script>
+</body>
+</html>

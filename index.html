@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo - Configuração do Jogo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+    
+<body>
+    <div class="container">
+        <header>
+            <h1>Jogo Termo</h1>
+            <p>Bem-vindo! Configure a partida para começar.</p>
+        </header>
+
+        <main>
+            <form id="config-form" class="config-form">
+                <div class="form-group">
+                    <label for="player1">Nome do Jogador 1:</label>
+                    <input type="text" id="player1" name="player1" required value="Jogador 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="player2">Nome do Jogador 2:</label>
+                    <input type="text" id="player2" name="player2" required value="Jogador 2">
+                </div>
+
+                <div class="form-group">
+                    <label for="word-length">Tamanho da Palavra:</label>
+                    <select id="word-length" name="word-length">
+                        <option value="5">5 letras</option>
+                        <option value="6">6 letras</option>
+                        <option value="7">7 letras</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="num-attempts">Número de Tentativas:</label>
+                    <select id="num-attempts" name="num-attempts">
+                        <option value="5">5</option>
+                        <option value="6" selected>6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="num-rounds">Número de Rodadas:</label>
+                    <select id="num-rounds" name="num-rounds">
+                        <option value="1">1 Rodada</option>
+                        <option value="3">Melhor de 3</option>
+                        <option value="5">Melhor de 5</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-start">Iniciar Jogo</button>
+            </form>
+        </main>
+
+    <footer>
+        </footer>
+    </div>
+    
+    <script src="js/palavras.js" defer></script>
+    <script src="js/config.js" defer></script>
+</body>
+</body>
+</html>

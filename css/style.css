@@ -1,0 +1,319 @@
+/* Estilos gerais do projeto Termo */
+
+/* Reset básico e definição da fonte */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Estilo do contêiner principal */
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px; /* Aumentado para acomodar o painel lateral */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+header h1 {
+    margin-top: 0;
+    color: #1a237e; /* Um tom de azul escuro */
+}
+
+/* --- Estilos da Página de Configuração --- */
+.config-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.form-group {
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+/* --- Estilos Gerais da Página do Jogo --- */
+.btn-start {
+    padding: 12px;
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.btn-start:hover {
+    background-color: #218838; /* Verde mais escuro */
+}
+
+:root {
+    --cor-correta: #538d4e;       /* Verde */
+    --cor-lugar-errado: #b59f3b;  /* Amarelo/Ocre */
+    --cor-errada: #3a3a3c;        /* Cinza escuro */
+    --cor-borda: #878a8c;         /* Cinza claro */
+}
+
+/* Indicador de turno */
+#turn-indicator {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1.2em;
+    height: 30px;
+}
+
+/* --- NOVO: Layout do Jogo e Painel de Ranking --- */
+
+/* Wrapper para o layout flex de duas colunas */
+.game-wrapper {
+    display: flex;
+    gap: 30px; /* Espaçamento entre o jogo e o painel */
+    width: 100%;
+}
+
+.main-game-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Painel lateral de ranking */
+#ranking-panel {
+    width: 240px; /* Largura fixa para o painel */
+    flex-shrink: 0;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+}
+#ranking-panel h4 {
+    margin-top: 0;
+    text-align: center;
+    color: #1a237e;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+#last-word-info {
+    font-size: 0.9em;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#live-ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#live-ranking-table th, #live-ranking-table td {
+    padding: 8px;
+    text-align: left;
+}
+#live-ranking-table tbody tr:first-child {
+    font-weight: bold;
+    color: var(--cor-correta); /* Destaque para o primeiro lugar */
+    background-color: #e8f5e9;
+}
+
+
+/* --- Estilos do Tabuleiro --- */
+#game-board-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+.game-board {
+    border-spacing: 5px;
+}
+.tile-container {
+    perspective: 1000px;
+}
+.tile {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+.tile.flip {
+    transform: rotateX(180deg);
+}
+.tile-front, .tile-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+.tile-front {
+    border: 2px solid var(--cor-borda);
+    background-color: #fff;
+    color: #000;
+}
+.tile-front.filled {
+    border-color: #565758;
+}
+.tile-back {
+    background-color: #fff;
+    color: white;
+    transform: rotateX(180deg);
+    border: 2px solid transparent;
+}
+.tile-back.correct {
+    background-color: var(--cor-correta);
+}
+.tile-back.misplaced {
+    background-color: var(--cor-lugar-errado);
+}
+.tile-back.wrong {
+    background-color: var(--cor-errada);
+}
+
+/* --- Teclado Virtual --- */
+#keyboard-container {
+    margin: 0 auto;
+    width: 100%;
+}
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+.keyboard-row button {
+    font-family: inherit;
+    font-weight: bold;
+    padding: 0;
+    margin: 0 3px;
+    height: 58px;
+    flex-grow: 1;
+    border: 0;
+    border-radius: 4px;
+    background-color: #d3d6da;
+    color: #1a1a1b;
+    cursor: pointer;
+    text-transform: uppercase;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.3);
+    transition: background-color 0.2s;
+}
+.keyboard-row button.key-large {
+    flex-grow: 1.5;
+}
+.keyboard-row button.correct {
+    background-color: var(--cor-correta);
+    color: white;
+}
+.keyboard-row button.misplaced {
+    background-color: var(--cor-lugar-errado);
+    color: white;
+}
+.keyboard-row button.wrong {
+    background-color: var(--cor-errada);
+    color: white;
+}
+
+/* --- Estilos do Modal de Ranking Final --- */
+.hidden {
+    display: none !important;
+}
+#ranking-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+#ranking-modal {
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+}
+#ranking-modal h2 {
+    margin-top: 0;
+}
+#ranking-table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+}
+#ranking-table th, #ranking-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+#ranking-table th {
+    background-color: #f2f2f2;
+}
+#ranking-table tr:first-child td {
+    font-weight: bold;
+    color: var(--cor-borda);
+}
+#ranking-play-again-btn {
+    margin-top: 10px;
+}
+
+/* --- NOVO: Media Query para telas pequenas --- */
+@media (max-width: 800px) {
+    .container {
+        max-width: 500px; /* Reduz o container em telas menores */
+    }
+    .game-wrapper {
+        flex-direction: column-reverse; /* Coloca o painel em cima do jogo */
+    }
+    #ranking-panel {
+        width: 100%; /* Ocupa a largura total */
+        box-sizing: border-box;
+        margin-bottom: 20px;
+    }
+    .tile {
+        width: 50px; /* Reduz um pouco as peças */
+        height: 50px;
+        font-size: 2rem;
+    }
+}
