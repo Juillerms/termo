@@ -5,11 +5,13 @@ class Jogador {
         this.nome = nome;
         this.pontos = 0;
         this.palavrasAcertadas = [];
+        this.acertou = false; // Adicionado para jogos de 1 rodada
     }
 
     adicionarVitoria(palavra) {
         this.pontos++;
         this.palavrasAcertadas.push(palavra);
+        this.acertou = true;
     }
 }
 
@@ -17,10 +19,7 @@ class Partida {
     constructor(nomesJogadores, config) {
         this.jogadores = nomesJogadores.map(nome => new Jogador(nome));
         this.config = config;
-        
-        // Filtra o banco de palavras pelo tamanho escolhido
         this.palavrasDisponiveis = PALAVRAS.filter(p => p.length === this.config.wordLength);
-        
         this.rodadaAtual = 0;
         this.palavraSecreta = '';
         this.tentativaAtual = 0;
@@ -44,60 +43,58 @@ iniciarNovaRodada() {
         this.jogadorAtualIndex = (this.jogadorAtualIndex + 1) % this.jogadores.length;
     }
 
-    // Resetar UI
+    if (this.config.numRounds > 1) {
+        document.getElementById('round-progress').textContent = `(Rodada ${this.rodadaAtual} de ${this.config.numRounds})`;
+        
+        // Se for a primeira rodada, define a mensagem inicial diretamente
+        if (this.rodadaAtual === 1) {
+            document.getElementById('last-word-info').textContent = "Aguardando 1ª rodada...";
+            // Atualiza a tabela de ranking apenas com os nomes e pontos iniciais
+            atualizarRankingLateral(null, null);
+        }
+    }
+
     desenharTabuleiro(this);
     limparTeclado();
-    atualizarUI(); // Para atualizar o indicador de turno
-    // Atualiza o painel lateral com os dados da partida
-    if(this.rodadaAtual > 1) { // Só mostra a info da "última palavra" a partir da 2ª rodada
-        // Esta chamada será feita no final da rodada anterior
-    } else {
-       atualizarRankingLateral("Nenhuma", null); // Estado inicial
-    }
+    atualizarUI();
 }
 
     sortearPalavra() {
         const index = Math.floor(Math.random() * this.palavrasDisponiveis.length);
-        const palavra = this.palavrasDisponiveis.splice(index, 1)[0]; // Remove a palavra para não repetir
-        return palavra || "ERRO"; // Retorna ERRO se acabarem as palavras
+        const palavra = this.palavrasDisponiveis.splice(index, 1)[0];
+        return palavra || "ERRO";
     }
 
-    // MÉTODO CORRIGIDO
-// Dentro da classe Partida
-processarPalpite(palpite) {
-    const resultado = this.validarPalpite(palpite);
-    const linhaDaJogada = this.tentativaAtual;
+    processarPalpite(palpite) {
+        const resultado = this.validarPalpite(palpite);
+        const linhaDaJogada = this.tentativaAtual;
 
-    atualizarUI(resultado, linhaDaJogada); // Anima o tabuleiro
+        atualizarUI(resultado, linhaDaJogada);
 
-    const venceu = palpite.toUpperCase() === this.palavraSecreta;
-    const perdeu = this.tentativaAtual >= this.config.numAttempts - 1;
+        const venceu = palpite.toUpperCase() === this.palavraSecreta;
+        const perdeu = this.tentativaAtual >= this.config.numAttempts - 1;
+        let vencedorDaRodada = null;
 
-    let vencedorDaRodada = null;
+        if (venceu) {
+            vencedorDaRodada = this.jogadores[this.jogadorAtualIndex];
+            vencedorDaRodada.adicionarVitoria(this.palavraSecreta);
+        }
 
-    if (venceu) {
-        vencedorDaRodada = this.jogadores[this.jogadorAtualIndex];
-        vencedorDaRodada.adicionarVitoria(this.palavraSecreta);
+        if (venceu || perdeu) {
+            if (this.config.numRounds === 1) {
+                setTimeout(() => this.finalizarPartida(), 1500);
+            } else {
+                setTimeout(() => {
+                    atualizarRankingLateral(this.palavraSecreta, vencedorDaRodada);
+                    this.iniciarNovaRodada();
+                }, 1500);
+            }
+        } else {
+            this.tentativaAtual++;
+            this.jogadorAtualIndex = (this.jogadorAtualIndex + 1) % this.jogadores.length;
+            setTimeout(() => atualizarUI(), 1500);
+        }
     }
-
-    // Se a rodada acabou (por vitória ou derrota), atualiza o painel e começa a próxima
-    if (venceu || perdeu) {
-        setTimeout(() => {
-            atualizarRankingLateral(this.palavraSecreta, vencedorDaRodada);
-            this.iniciarNovaRodada();
-        }, 1500); // Espera a animação para mudar de rodada
-    }
-    // Se a rodada continua, apenas troca o turno
-    else {
-        this.tentativaAtual++;
-        this.jogadorAtualIndex = (this.jogadorAtualIndex + 1) % this.jogadores.length;
-
-        setTimeout(() => {
-            atualizarUI(); // Atualiza o indicador "Vez de:"
-        }, 1500);
-    }
-}
-
 
     validarPalpite(palpite) {
         const p = palpite.toUpperCase();
@@ -123,9 +120,48 @@ processarPalpite(palpite) {
         return resultado;
     }
 
+    // Dentro da classe Partida
     finalizarPartida() {
         this.estado = 'finalizado';
         document.getElementById('turn-indicator').textContent = "Fim de Jogo!";
+        
+        // --- LÓGICA ADICIONADA PARA DETERMINAR O VENCEDOR ---
+        const jogadoresOrdenados = [...this.jogadores].sort((a, b) => b.pontos - a.pontos);
+        const vencedor = jogadoresOrdenados[0];
+        const segundoLugar = jogadoresOrdenados[1];
+        const modalTitle = document.querySelector('#ranking-modal h2');
+        
+        // Cria o elemento para a mensagem do vencedor
+        const winnerMessage = document.createElement('p');
+        winnerMessage.style.fontWeight = 'bold';
+        winnerMessage.style.fontSize = '1.2em';
+        winnerMessage.style.margin = '10px 0 20px 0';
+        
+        // Verifica se houve um vencedor ou empate
+        if (vencedor.pontos > segundoLugar.pontos) {
+            winnerMessage.textContent = `O jogador ${vencedor.nome} venceu!!`;
+            winnerMessage.style.color = 'var(--cor-correta)'; // Cor verde
+        } else if (vencedor.pontos === 0) {
+            winnerMessage.textContent = 'A partida terminou em empate, sem vencedores.';
+        }
+        else {
+            winnerMessage.textContent = 'A partida terminou em empate!';
+        }
+        
+        // Insere a mensagem logo após o título "Fim de Jogo!"
+        modalTitle.insertAdjacentElement('afterend', winnerMessage);
+
+        // Lógica para o caso de 1 rodada (que já existia)
+        if (this.config.numRounds === 1) {
+            const rankingTable = document.getElementById('ranking-table');
+            if (!vencedor.acertou) { // Se ninguém acertou
+                rankingTable.style.display = 'none';
+                const p = document.createElement('p');
+                p.textContent = `Ninguém acertou, a palavra era: ${this.palavraSecreta}`;
+                winnerMessage.insertAdjacentElement('afterend', p);
+            }
+        }
+        
         mostrarRanking(this.jogadores);
     }
 }
@@ -163,80 +199,67 @@ function limparTeclado() {
 }
 
 function atualizarUI(resultado, linhaParaAtualizar) {
-    // Atualiza placar e indicador de turno
     if (partida.estado === 'jogando') {
         const jogadorAtual = partida.jogadores[partida.jogadorAtualIndex];
         document.getElementById('turn-indicator').textContent = `Vez de: ${jogadorAtual.nome}`;
     }
 
-    // Se houver um resultado de palpite, anima o tabuleiro
     if (resultado) {
         resultado.forEach((item, index) => {
-            // Usa a linha que foi passada como parâmetro
             const tile = document.getElementById(`tile-${linhaParaAtualizar}-${index}`);
             const tileBack = tile.querySelector('.tile-back');
-            
-            // Coloca a letra na face de trás para a animação
             tileBack.textContent = item.letra;
             tileBack.classList.add(item.estado);
-
             setTimeout(() => tile.classList.add('flip'), index * 200);
-
-            // Atualiza o teclado virtual
             const keyButton = document.querySelector(`.keyboard-row button[data-key="${item.letra}"]`);
-            if (keyButton) { // Adiciona verificação para segurança
+            if (keyButton) {
                 keyButton.classList.add(item.estado);
             }
         });
     }
 }
 
-
-// Nova função para mostrar notificações
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-
-    // Remove classes antigas e adiciona as novas
-    notification.classList.remove('success', 'failure', 'hidden');
-    notification.classList.add(type); // 'success' ou 'failure'
-
-    // Mostra a notificação
-    notification.classList.add('show');
-
-    // Esconde a notificação após 3 segundos
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
-
-// Nova função para atualizar o painel lateral
+// Substitua a sua função 'atualizarRankingLateral' por esta versão
 function atualizarRankingLateral(ultimaPalavra, vencedor) {
-    const panel = document.getElementById('ranking-panel');
     const lastWordInfo = document.getElementById('last-word-info');
     const tableBody = document.getElementById('live-ranking-body');
 
-    // Atualiza a informação da última rodada
-    if (vencedor) {
-        lastWordInfo.innerHTML = `<strong>${vencedor.nome}</strong> acertou a palavra <strong>${ultimaPalavra}</strong>!`;
-    } else {
-        lastWordInfo.innerHTML = `A palavra <strong>${ultimaPalavra}</strong> não foi descoberta.`;
+    // Esta função agora SÓ atualiza a informação da última palavra
+    // se uma palavra tiver sido de facto jogada.
+    if (ultimaPalavra) {
+        if (vencedor) {
+            lastWordInfo.innerHTML = `Palavra Anterior: <strong>${ultimaPalavra}</strong><br><small>(${vencedor.nome} acertou)</small>`;
+        } else {
+            lastWordInfo.innerHTML = `Palavra Anterior: <strong>${ultimaPalavra}</strong><br><small>&nbsp;&nbsp;(Não descoberta)</small>`;
+        }
     }
 
-    // Ordena os jogadores por pontos
+    // A lógica de atualizar a tabela de pontos continua a mesma
     const jogadoresOrdenados = [...partida.jogadores].sort((a, b) => b.pontos - a.pontos);
     
-    // Limpa e recria a tabela de ranking
     tableBody.innerHTML = '';
     jogadoresOrdenados.forEach((jogador, index) => {
         const tr = document.createElement('tr');
         const pos = index + 1;
-
         tr.innerHTML = `<td>${pos}º</td><td>${jogador.nome}</td><td>${jogador.pontos}</td>`;
         tableBody.appendChild(tr);
     });
 }
 
+function mostrarRanking(jogadores) {
+    const tableBody = document.getElementById('ranking-table-body');
+    tableBody.innerHTML = '';
+
+    const jogadoresOrdenados = [...jogadores].sort((a, b) => b.pontos - a.pontos);
+
+    jogadoresOrdenados.forEach(jogador => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${jogador.nome}</td><td>${jogador.pontos}</td><td>${jogador.palavrasAcertadas.join(', ') || '-'}</td>`;
+        tableBody.appendChild(tr);
+    });
+
+    document.getElementById('ranking-modal-overlay').classList.remove('hidden');
+}
 
 function handleKeyPress(key) {
     if (partida.estado !== 'jogando') return;
@@ -262,11 +285,10 @@ function handleKeyPress(key) {
     }
 }
 
-
 // --- INICIALIZAÇÃO DA PARTIDA ---
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
-    const nomesJogadores = [params.get('jogador1'), params.get('jogador2')]; 
+    const nomesJogadores = [params.get('jogador1'), params.get('jogador2')];
     const config = {
         wordLength: parseInt(params.get('wordLength'), 10),
         numAttempts: parseInt(params.get('numAttempts'), 10),
@@ -274,14 +296,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (!nomesJogadores[0] || !config.wordLength) {
-        // Não estamos na página do jogo, não faz nada
         return;
     }
-    
+
     partida = new Partida(nomesJogadores, config);
+
+    if (partida.config.numRounds === 1) {
+        document.getElementById('ranking-panel').classList.add('hidden');
+        document.querySelector('.game-wrapper').classList.add('center-game');
+    } else {
+        document.getElementById('ranking-panel').classList.remove('hidden');
+    }
+
     partida.iniciarNovaRodada();
 
-    // Event Listeners
     document.getElementById('keyboard-container').addEventListener('click', (event) => {
         if (event.target.tagName === 'BUTTON') handleKeyPress(event.target.getAttribute('data-key'));
     });

@@ -20,7 +20,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 900px; /* Aumentado para acomodar o painel lateral */
+    max-width: 1100px; /* Aumentado para dar mais espaço no desktop */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -87,13 +87,17 @@ header h1 {
     height: 30px;
 }
 
-/* --- NOVO: Layout do Jogo e Painel de Ranking --- */
+/* --- Layout do Jogo e Painel de Ranking --- */
 
-/* Wrapper para o layout flex de duas colunas */
 .game-wrapper {
     display: flex;
-    gap: 30px; /* Espaçamento entre o jogo e o painel */
+    gap: 30px;
     width: 100%;
+}
+
+/* Centraliza a área do jogo quando o painel lateral está escondido */
+.game-wrapper.center-game {
+    justify-content: center;
 }
 
 .main-game-area {
@@ -104,7 +108,7 @@ header h1 {
 
 /* Painel lateral de ranking */
 #ranking-panel {
-    width: 240px; /* Largura fixa para o painel */
+    width: 380px; /* Aumentado para acomodar melhor o texto */
     flex-shrink: 0;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -119,6 +123,16 @@ header h1 {
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
 }
+
+/* Estilo para o indicador de progresso da rodada */
+#round-progress {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
 #last-word-info {
     font-size: 0.9em;
     text-align: center;
@@ -141,7 +155,7 @@ header h1 {
 }
 #live-ranking-table tbody tr:first-child {
     font-weight: bold;
-    color: var(--cor-correta); /* Destaque para o primeiro lugar */
+    color: var(--cor-correta);
     background-color: #e8f5e9;
 }
 
@@ -298,21 +312,21 @@ header h1 {
     margin-top: 10px;
 }
 
-/* --- NOVO: Media Query para telas pequenas --- */
+/* Media Query para telas pequenas */
 @media (max-width: 800px) {
     .container {
-        max-width: 500px; /* Reduz o container em telas menores */
+        max-width: 500px;
     }
     .game-wrapper {
-        flex-direction: column-reverse; /* Coloca o painel em cima do jogo */
+        flex-direction: column-reverse;
     }
     #ranking-panel {
-        width: 100%; /* Ocupa a largura total */
+        width: 100%;
         box-sizing: border-box;
         margin-bottom: 20px;
     }
     .tile {
-        width: 50px; /* Reduz um pouco as peças */
+        width: 50px;
         height: 50px;
         font-size: 2rem;
     }
