@@ -1,24 +1,22 @@
-# O nome do nosso workflow (pode ser o mesmo)
-name: CI - Lint e Deploy
+# NOME DO FICHEIRO: .github/workflows/ci-testes.yml
+
+# O nome do nosso workflow de testes da semana
+name: CI - Testes (Mon-Thu)
 
 # Define quando o workflow deve ser executado.
 on:
   push:
-    branches: [ "main" ] # Só executa em pushes para o ramo "main"
+    branches: [ "main" ] # Executa em qualquer push para o ramo principal
   pull_request:
     branches: [ "main" ]
 
-# --- NOVO ---
-# Adiciona permissões ao workflow para ele poder
-# escrever no GitHub Pages.
+# Permissões (já não precisa das permissões de "pages")
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Define os "trabalhos" (jobs)
 jobs:
-  # --- JOB 1 (O que já tínhamos) ---
+  # --- JOB 1 (O ÚNICO JOB DESTE FICHEIRO) ---
   lint-javascript:
     name: 1. Lint (Testes)
     runs-on: ubuntu-latest
@@ -35,30 +33,4 @@ jobs:
       - name: Rodar testes (ESLint)
         run: npm test
 
-  # --- JOB 2 (O NOVO JOB DE DEPLOY) ---
-  deploy-to-pages:
-    name: 2. Deploy para GitHub Pages
-    runs-on: ubuntu-latest
-    
-    # --- IMPORTANTE ---
-    # Este job só começa DEPOIS que o 'lint-javascript' terminar com sucesso
-    needs: lint-javascript
-    
-    # Passos para fazer o deploy
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload do "artifact" (o nosso site)
-        # Diz ao GitHub quais ficheiros formam o nosso site.
-        # Estamos a dizer para carregar TUDO da pasta principal ('.').
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: Deploy para GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  # O job de deploy foi REMOVIDO daqui!

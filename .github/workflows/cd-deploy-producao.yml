@@ -1,0 +1,60 @@
+# NOME DO FICHEIRO: .github/workflows/cd-deploy-producao.yml
+
+# O nome do nosso workflow de deploy de sexta-feira
+name: CD - Deploy para Produção (Manual)
+
+# Define quando o workflow deve ser executado.
+on:
+  # --- ESTE É O GATILHO MANUAL ---
+  # Permite que aciones este workflow manualmente a partir do separador "Actions"
+  workflow_dispatch:
+
+# Adiciona permissões para o deploy
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Define os "trabalhos" (jobs)
+jobs:
+  # --- JOB 1 (Repetimos o teste por segurança) ---
+  lint-javascript:
+    name: 1. Lint (Testes)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Instalar dependências
+        run: npm ci
+      - name: Rodar testes (ESLint)
+        run: npm test
+
+  # --- JOB 2 (O JOB DE DEPLOY) ---
+  deploy-to-pages:
+    name: 2. Deploy para GitHub Pages
+    runs-on: ubuntu-latest
+    
+    # Depende do sucesso do Job 1
+    needs: lint-javascript
+    
+    # Passos para fazer o deploy
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload do "artifact" (o nosso site)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
