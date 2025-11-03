@@ -1,11 +1,10 @@
-// --- DEFINIÇÃO DAS CLASSES ---
 
 class Jogador {
     constructor(nome) {
         this.nome = nome;
         this.pontos = 0;
         this.palavrasAcertadas = [];
-        this.acertou = false; // Adicionado para jogos de 1 rodada
+        this.acertou = false; 
     }
 
     adicionarVitoria(palavra) {
@@ -27,7 +26,6 @@ class Partida {
         this.estado = 'jogando';
     }
 
-    // Dentro da classe Partida
 iniciarNovaRodada() {
     if (this.rodadaAtual >= this.config.numRounds) {
         this.finalizarPartida();
@@ -46,10 +44,8 @@ iniciarNovaRodada() {
     if (this.config.numRounds > 1) {
         document.getElementById('round-progress').textContent = `(Rodada ${this.rodadaAtual} de ${this.config.numRounds})`;
         
-        // Se for a primeira rodada, define a mensagem inicial diretamente
         if (this.rodadaAtual === 1) {
             document.getElementById('last-word-info').textContent = "Aguardando 1ª rodada...";
-            // Atualiza a tabela de ranking apenas com os nomes e pontos iniciais
             atualizarRankingLateral(null, null);
         }
     }
@@ -120,24 +116,20 @@ iniciarNovaRodada() {
         return resultado;
     }
 
-    // Dentro da classe Partida
     finalizarPartida() {
         this.estado = 'finalizado';
         document.getElementById('turn-indicator').textContent = "Fim de Jogo!";
         
-        // --- LÓGICA ADICIONADA PARA DETERMINAR O VENCEDOR ---
         const jogadoresOrdenados = [...this.jogadores].sort((a, b) => b.pontos - a.pontos);
         const vencedor = jogadoresOrdenados[0];
         const segundoLugar = jogadoresOrdenados[1];
         const modalTitle = document.querySelector('#ranking-modal h2');
         
-        // Cria o elemento para a mensagem do vencedor
         const winnerMessage = document.createElement('p');
         winnerMessage.style.fontWeight = 'bold';
         winnerMessage.style.fontSize = '1.2em';
         winnerMessage.style.margin = '10px 0 20px 0';
         
-        // Verifica se houve um vencedor ou empate
         if (vencedor.pontos > segundoLugar.pontos) {
             winnerMessage.textContent = `O jogador ${vencedor.nome} venceu!!`;
             winnerMessage.style.color = 'var(--cor-correta)'; // Cor verde
@@ -148,13 +140,11 @@ iniciarNovaRodada() {
             winnerMessage.textContent = 'A partida terminou em empate!';
         }
         
-        // Insere a mensagem logo após o título "Fim de Jogo!"
         modalTitle.insertAdjacentElement('afterend', winnerMessage);
 
-        // Lógica para o caso de 1 rodada (que já existia)
         if (this.config.numRounds === 1) {
             const rankingTable = document.getElementById('ranking-table');
-            if (!vencedor.acertou) { // Se ninguém acertou
+            if (!vencedor.acertou) { 
                 rankingTable.style.display = 'none';
                 const p = document.createElement('p');
                 p.textContent = `Ninguém acertou, a palavra era: ${this.palavraSecreta}`;
@@ -166,7 +156,6 @@ iniciarNovaRodada() {
     }
 }
 
-// --- FUNÇÕES GLOBAIS DE UI E CONTROLO ---
 let partida;
 let palpiteAtual = '';
 
@@ -219,13 +208,10 @@ function atualizarUI(resultado, linhaParaAtualizar) {
     }
 }
 
-// Substitua a sua função 'atualizarRankingLateral' por esta versão
 function atualizarRankingLateral(ultimaPalavra, vencedor) {
     const lastWordInfo = document.getElementById('last-word-info');
     const tableBody = document.getElementById('live-ranking-body');
 
-    // Esta função agora SÓ atualiza a informação da última palavra
-    // se uma palavra tiver sido de facto jogada.
     if (ultimaPalavra) {
         if (vencedor) {
             lastWordInfo.innerHTML = `Palavra Anterior: <strong>${ultimaPalavra}</strong><br><small>(${vencedor.nome} acertou)</small>`;
@@ -234,7 +220,6 @@ function atualizarRankingLateral(ultimaPalavra, vencedor) {
         }
     }
 
-    // A lógica de atualizar a tabela de pontos continua a mesma
     const jogadoresOrdenados = [...partida.jogadores].sort((a, b) => b.pontos - a.pontos);
     
     tableBody.innerHTML = '';
@@ -285,7 +270,6 @@ function handleKeyPress(key) {
     }
 }
 
-// --- INICIALIZAÇÃO DA PARTIDA ---
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const nomesJogadores = [params.get('jogador1'), params.get('jogador2')];
