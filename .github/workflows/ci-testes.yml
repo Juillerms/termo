@@ -1,40 +1,64 @@
-# O nome do nosso workflow.
-name: CI - Lint e Testes
+# O nome do nosso workflow (pode ser o mesmo)
+name: CI - Lint e Deploy
 
 # Define quando o workflow deve ser executado.
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # Só executa em pushes para o ramo "main"
   pull_request:
     branches: [ "main" ]
 
-# Define os "trabalhos" (jobs) que este workflow vai executar.
-jobs:
-  # O nome do nosso job (agora chamado 'lint')
-  lint-javascript:
-    # A máquina virtual onde o código vai ser executado.
-    runs-on: ubuntu-latest
+# --- NOVO ---
+# Adiciona permissões ao workflow para ele poder
+# escrever no GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-    # Os passos (steps) que o job vai executar em sequência.
+# Define os "trabalhos" (jobs)
+jobs:
+  # --- JOB 1 (O que já tínhamos) ---
+  lint-javascript:
+    name: 1. Lint (Testes)
+    runs-on: ubuntu-latest
     steps:
-      # 1. Passo para "baixar" o código do seu repositório.
       - name: Checkout do código
         uses: actions/checkout@v4
-
-      # 2. Passo para configurar o ambiente Node.js.
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Usando uma versão mais moderna do Node
-          cache: 'npm'      # Adiciona cache para acelerar futuras instalações
-
-      # 3. Passo para instalar as dependências.
-      # 'npm ci' é usado em vez de 'npm install' em CI.
-      # Ele usa o 'package-lock.json' para uma instalação rápida e exata.
+          node-version: '20'
+          cache: 'npm'
       - name: Instalar dependências
         run: npm ci
-
-      # 4. Passo para executar os testes (o Linter).
-      # Este comando vem do "scripts" -> "test" do nosso package.json
       - name: Rodar testes (ESLint)
         run: npm test
+
+  # --- JOB 2 (O NOVO JOB DE DEPLOY) ---
+  deploy-to-pages:
+    name: 2. Deploy para GitHub Pages
+    runs-on: ubuntu-latest
+    
+    # --- IMPORTANTE ---
+    # Este job só começa DEPOIS que o 'lint-javascript' terminar com sucesso
+    needs: lint-javascript
+    
+    # Passos para fazer o deploy
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload do "artifact" (o nosso site)
+        # Diz ao GitHub quais ficheiros formam o nosso site.
+        # Estamos a dizer para carregar TUDO da pasta principal ('.').
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
