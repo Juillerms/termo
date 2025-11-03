@@ -1,24 +1,23 @@
-# O nome do nosso workflow. Aparecerá no separador "Actions".
-name: CI - Testes do Jogo Termo
+# O nome do nosso workflow.
+name: CI - Lint e Testes
 
 # Define quando o workflow deve ser executado.
 on:
-  push: # Executa em qualquer "push" para qualquer ramo.
-    branches: [ "main" ] # Pode restringir para o ramo principal
-  pull_request: # Executa também em "pull requests"
+  push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 # Define os "trabalhos" (jobs) que este workflow vai executar.
 jobs:
-  # O nome do nosso job (pode ser qualquer nome)
-  build-and-test:
+  # O nome do nosso job (agora chamado 'lint')
+  lint-javascript:
     # A máquina virtual onde o código vai ser executado.
-    # "ubuntu-latest" é a mais comum e recomendada.
     runs-on: ubuntu-latest
 
     # Os passos (steps) que o job vai executar em sequência.
     steps:
-      # 1. Passo para "baixar" o código do seu repositório para a máquina virtual.
+      # 1. Passo para "baixar" o código do seu repositório.
       - name: Checkout do código
         uses: actions/checkout@v4
 
@@ -26,13 +25,16 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Vamos usar a versão 18 do Node.js
+          node-version: '20' # Usando uma versão mais moderna do Node
+          cache: 'npm'      # Adiciona cache para acelerar futuras instalações
 
-      # 3. Passo para instalar as dependências do projeto (ex: React, Jest, etc.)
+      # 3. Passo para instalar as dependências.
+      # 'npm ci' é usado em vez de 'npm install' em CI.
+      # Ele usa o 'package-lock.json' para uma instalação rápida e exata.
       - name: Instalar dependências
-        run: npm install
+        run: npm ci
 
-      # 4. Passo para executar os testes.
-      # (Isto assume que temos um script "test" no nosso package.json)
-      - name: Rodar testes
+      # 4. Passo para executar os testes (o Linter).
+      # Este comando vem do "scripts" -> "test" do nosso package.json
+      - name: Rodar testes (ESLint)
         run: npm test
