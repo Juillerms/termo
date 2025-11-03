@@ -4,7 +4,7 @@
   "description": "Jogo Termo em JavaScript",
   "main": "js/jogo.js",
   "scripts": {
-    "test": "eslint js/*.js"
+    "test": "eslint js/config.js js/jogo.js"
   },
   "devDependencies": {
     "eslint": "^8.57.0"
